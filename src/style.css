@@ -1,0 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
+div,
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+}
