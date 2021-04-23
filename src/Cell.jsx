@@ -9,10 +9,8 @@ import { useFrame } from "@react-three/fiber";
 import { Color, Vector3 } from "three";
 import { CellBoardContext } from "./CellBoardContext";
 
-const lifeColor = new Color(0xffa5003);
+const lifeColor = new Color(0xfa5003);
 const deadColor = new Color(0xcacaca);
-console.log("life Color = " + lifeColor.getHexString());
-console.log("dead Color = " + deadColor.getHexString());
 
 function Cell(props) {
   const initalY = props.position[1];
@@ -50,6 +48,11 @@ function Cell(props) {
       mesh.current.position.y = mesh.current.position.lerp(vlive, 0.1).y;
     }
 
+    //Animation for a cell to go Dead
+    if (onloadAnimationIsFinished && !Life && mesh.current.position !== vInit) {
+      mesh.current.position.y = mesh.current.position.lerp(vInit, 0.1).y;
+    }
+
     //Color change to go Alive
     if (
       onloadAnimationIsFinished &&
@@ -66,11 +69,6 @@ function Cell(props) {
       !meshpm.current.color.equals(deadColor)
     ) {
       meshpm.current.color = meshpm.current.color.lerp(deadColor, 0.1);
-    }
-
-    //Animation for a cell to go Dead
-    if (onloadAnimationIsFinished && !Life && mesh.current.position !== vInit) {
-      mesh.current.position.y = mesh.current.position.lerp(vInit, 0.1).y;
     }
   });
   const handleBoardUpdate = useCallback(

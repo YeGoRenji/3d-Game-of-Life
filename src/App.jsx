@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Cell from "./Cell";
 import { Button, Box, Flex } from "@chakra-ui/react";
 import CameraController from "./CameraController";
 import "./style.css";
-import { FaPlay, FaPause } from "react-icons/fa";
+import { FaPlay, FaPause, FaRedoAlt } from "react-icons/fa";
 import * as THREE from "three";
 import GameLogic from "./GameLogic";
 import { CellBoardContext } from "./CellBoardContext";
@@ -45,11 +45,7 @@ const Plane = (props) => {
   );
 };
 
-const Scene = ({ playing }) => {
-  const [board, setBoard] = useState(
-    [...Array(CELL_ROWS)].map(() => [...Array(CELL_COLUMNS)].fill(0))
-  );
-
+const Scene = ({ playing, board, setBoard }) => {
   useEffect(() => {
     const handle = setInterval(() => {
       if (playing) setBoard((curr) => GameLogic(curr));
@@ -111,6 +107,14 @@ const Scene = ({ playing }) => {
 
 function App() {
   const [playing, setPlaying] = useState(false);
+  const [board, setBoard] = useState(
+    [...Array(CELL_ROWS)].map(() => [...Array(CELL_COLUMNS)].fill(0))
+  );
+  const resetBoard = useCallback(() => {
+    const updatedBoard = [...board];
+    updatedBoard.map((a) => a.fill(0));
+    setBoard(updatedBoard);
+  }, []);
   return (
     <>
       <Box h="100vh">
@@ -128,20 +132,57 @@ function App() {
           }}
         >
           <fog attach="fog" args={["black", 50, 200]} />
-          <Scene playing={playing} />
+          <Scene playing={playing} board={board} setBoard={setBoard} />
         </Canvas>
-        <Flex justifyContent="center">
-          <Button
+        <Flex
+          visibility="hidden"
+          left="0"
+          top="0"
+          position="absolute"
+          w="100%"
+          h="100vh"
+          justifyContent="center"
+        >
+          <Box
+            visibility="visible"
+            borderRadius="10px"
+            border="2px solid rgba(255,255,255,0.2)"
             position="absolute"
-            w="50px"
-            h="50px"
             bottom="10px"
-            colorScheme="orange"
-            _focus={{ outline: "none" }}
-            onClick={() => setPlaying(!playing)}
           >
-            {playing ? <FaPause /> : <FaPlay />}
-          </Button>
+            <Button
+              visibility="visible"
+              margin="10px"
+              w="50px"
+              h="50px"
+              colorScheme="orange"
+              _focus={{ outline: "none" }}
+              onClick={() => setPlaying(!playing)}
+            >
+              {playing ? <FaPause /> : <FaPlay />}
+            </Button>
+            <Button
+              visibility="visible"
+              margin="10px"
+              w="50px"
+              h="50px"
+              colorScheme="orange"
+              _focus={{ outline: "none" }}
+              onClick={resetBoard}
+            >
+              <FaRedoAlt />
+            </Button>
+          </Box>
+          <Box
+            position="absolute"
+            fontWeight="bold"
+            right="5px"
+            bottom="0"
+            color="orange"
+            visibility="visible"
+          >
+            BY YEGO
+          </Box>
         </Flex>
       </Box>
     </>
