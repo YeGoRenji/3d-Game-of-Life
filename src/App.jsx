@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Cell from "./Cell";
-import { Button, Box, Flex } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import CameraController from "./CameraController";
 import "./style.css";
-import { FaPlay, FaPause, FaRedoAlt } from "react-icons/fa";
 import * as THREE from "three";
 import GameLogic from "./GameLogic";
 import { CellBoardContext } from "./CellBoardContext";
+import Ui from "../components/Ui";
 
 const CELL_ROWS = 25;
 const CELL_COLUMNS = 25;
@@ -110,82 +110,27 @@ function App() {
   const [board, setBoard] = useState(
     [...Array(CELL_ROWS)].map(() => [...Array(CELL_COLUMNS)].fill(0))
   );
-  const resetBoard = useCallback(() => {
-    const updatedBoard = [...board];
-    updatedBoard.map((a) => a.fill(0));
-    setBoard(updatedBoard);
-  }, []);
   return (
-    <>
-      <Box h="100vh">
-        <Canvas
-          camera={{
-            position: [
-              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
-              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
-              0,
-            ],
-          }}
-          onCreated={({ gl }) => {
-            gl.shadowMap.enabled = true;
-            gl.shadowMap.type = THREE.PCFSoftShadowMap;
-          }}
-        >
-          <fog attach="fog" args={["black", 50, 200]} />
-          <Scene playing={playing} board={board} setBoard={setBoard} />
-        </Canvas>
-        <Flex
-          visibility="hidden"
-          left="0"
-          top="0"
-          position="absolute"
-          w="100%"
-          h="100vh"
-          justifyContent="center"
-        >
-          <Box
-            visibility="visible"
-            borderRadius="10px"
-            border="2px solid rgba(255,255,255,0.2)"
-            position="absolute"
-            bottom="10px"
-          >
-            <Button
-              visibility="visible"
-              margin="10px"
-              w="50px"
-              h="50px"
-              colorScheme="orange"
-              _focus={{ outline: "none" }}
-              onClick={() => setPlaying(!playing)}
-            >
-              {playing ? <FaPause /> : <FaPlay />}
-            </Button>
-            <Button
-              visibility="visible"
-              margin="10px"
-              w="50px"
-              h="50px"
-              colorScheme="orange"
-              _focus={{ outline: "none" }}
-              onClick={resetBoard}
-            >
-              <FaRedoAlt />
-            </Button>
-          </Box>
-          <Box
-            position="absolute"
-            fontWeight="bold"
-            right="5px"
-            bottom="0"
-            color="orange"
-            visibility="visible"
-          >
-            BY YEGO
-          </Box>
-        </Flex>
-      </Box>
-    </>
+    <Box h="100vh">
+      <Canvas
+        camera={{
+          position: [
+            2 * Math.max(CELL_ROWS, CELL_COLUMNS),
+            2 * Math.max(CELL_ROWS, CELL_COLUMNS),
+            0,
+          ],
+        }}
+        onCreated={({ gl }) => {
+          gl.shadowMap.enabled = true;
+          gl.shadowMap.type = THREE.PCFSoftShadowMap;
+        }}
+      >
+        <fog attach="fog" args={["black", 50, 200]} />
+        <Scene playing={playing} board={board} setBoard={setBoard} />
+      </Canvas>
+
+      <Ui hooks={{ playing, setPlaying, board, setBoard }} />
+    </Box>
   );
 }
 

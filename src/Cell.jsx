@@ -39,7 +39,7 @@ function Cell(props) {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     const onloadAnimationIsFinished = t >= props.phase + (2 * Math.PI) / w;
-    // the Onload Animation
+    //the Onload Animation
     if (t >= props.phase && t <= props.phase + (2 * Math.PI) / w)
       mesh.current.position.y = initalY + Amp * Math.sin(w * (t - props.phase));
 
