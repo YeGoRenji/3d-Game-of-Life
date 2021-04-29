@@ -1,6 +1,23 @@
 import React, { useCallback, useState } from "react";
-import { FaPlay, FaPause, FaRedoAlt } from "react-icons/fa";
+import { FaPlay, FaStepForward, FaPause, FaRedoAlt } from "react-icons/fa";
+import GameLogic from "../src/GameLogic";
 import { Button, Box, Flex, Grid, Text } from "@chakra-ui/react";
+
+const GameUiBtn = (props) => {
+  return (
+    <Button
+      visibility="visible"
+      margin="10px"
+      w="50px"
+      h="50px"
+      colorScheme="orange"
+      _focus={{ outline: "none" }}
+      {...props}
+    >
+      {props.children}
+    </Button>
+  );
+};
 
 const GameUi = (props) => {
   const { playing, setPlaying, board, setBoard } = props.hooks;
@@ -18,28 +35,21 @@ const GameUi = (props) => {
         position="absolute"
         bottom="10px"
       >
-        <Button
-          visibility="visible"
-          margin="10px"
-          w="50px"
-          h="50px"
-          colorScheme="orange"
-          _focus={{ outline: "none" }}
-          onClick={() => setPlaying(!playing)}
-        >
+        <GameUiBtn onClick={() => setPlaying(!playing)}>
           {playing ? <FaPause /> : <FaPlay />}
-        </Button>
-        <Button
-          visibility="visible"
-          margin="10px"
-          w="50px"
-          h="50px"
-          colorScheme="orange"
-          _focus={{ outline: "none" }}
-          onClick={resetBoard}
+        </GameUiBtn>
+
+        <GameUiBtn
+          onClick={() => {
+            if (!playing) setBoard((curr) => GameLogic(curr));
+          }}
         >
+          <FaStepForward />
+        </GameUiBtn>
+
+        <GameUiBtn onClick={resetBoard}>
           <FaRedoAlt />
-        </Button>
+        </GameUiBtn>
       </Box>
       <Box
         fontFamily="roboto"
@@ -89,6 +99,7 @@ const MenuUi = ({ setInGame }) => {
     </Grid>
   );
 };
+
 function Ui(props) {
   const [inGame, setInGame] = useState(false);
   return (
