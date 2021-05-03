@@ -6,8 +6,7 @@ function componentToHex(c) {
   const hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
 }
-function hexToLightHex(hex, per) {
-  const p = per;
+function hexToLightHex(hex, p) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   const rgb = {
     r: Math.floor(
@@ -25,8 +24,7 @@ function hexToLightHex(hex, per) {
   );
 }
 
-function hexToDimHex(hex, per) {
-  const p = per;
+function hexToDimHex(hex, p) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   const rgb = {
     r: Math.floor(parseInt(result[1], 16) - p * parseInt(result[1], 16)),
@@ -50,7 +48,7 @@ export const GameUiBtn = (props) => {
       _active={{ bg: hexToLightHex(color, 0.1) }}
       _focus={{ outline: "none" }}
       _hover={{ bg: hexToDimHex(color, 0.1) }}
-      color={color === "#ffeb3b" ? "black" : "white"}
+      color={color === "#f7df1e" ? "black" : "white"}
       {...props}
     >
       {props.children}
