@@ -1,25 +1,14 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { FaPlay, FaStepForward, FaPause, FaRedoAlt } from "react-icons/fa";
 import GameLogic from "../src/GameLogic";
-import { Button, Box, Flex, Grid, Text } from "@chakra-ui/react";
-
-const GameUiBtn = (props) => {
-  return (
-    <Button
-      visibility="visible"
-      margin="10px"
-      w="50px"
-      h="50px"
-      colorScheme="orange"
-      _focus={{ outline: "none" }}
-      {...props}
-    >
-      {props.children}
-    </Button>
-  );
-};
+import { Box, Flex, Grid, Text } from "@chakra-ui/react";
+import OptionsUi from "./OptionsUi";
+import { MenuUiBtn } from "./MenuUiBtn";
+import { GameUiBtn } from "./GameUiBtn";
+import { ColorContext } from "./ColorContext";
 
 const GameUi = (props) => {
+  const { color } = useContext(ColorContext);
   const { playing, setPlaying, board, setBoard } = props.hooks;
   const resetBoard = useCallback(() => {
     const updatedBoard = [...board];
@@ -57,7 +46,7 @@ const GameUi = (props) => {
         fontWeight="bold"
         right="5px"
         bottom="0"
-        color="orange"
+        color={color}
         visibility="visible"
       >
         BY YEGO
@@ -66,7 +55,7 @@ const GameUi = (props) => {
   );
 };
 
-const MenuUi = ({ setInGame }) => {
+const MenuUi = ({ setInGame, setInOptions }) => {
   return (
     <Grid
       justifyContent="center"
@@ -84,43 +73,36 @@ const MenuUi = ({ setInGame }) => {
         WELCOME TO <br />
         3D GAME OF LIFE
       </Text>
-      <Flex justify="center" dir="rows">
-        <Button
-          fontFamily="roboto"
-          my="40px"
-          h="50px"
-          w="100px"
-          colorScheme="orange"
-          onClick={() => setInGame(true)}
-        >
-          PLAY
-        </Button>
+      <Flex align="center" flexDirection="column">
+        <MenuUiBtn onClick={() => setInGame(true)}>PLAY</MenuUiBtn>
+        <MenuUiBtn onClick={() => setInOptions(true)}>OPTIONS</MenuUiBtn>
       </Flex>
     </Grid>
   );
 };
 
 function Ui(props) {
-  const [inGame, setInGame] = useState(false);
+  const [inOptions, setInOptions] = useState(false);
+  const { inGame, setInGame } = props.inGame;
   return (
-    <>
-      <Flex
-        visibility={inGame ? "hidden" : "visible"}
-        bg={inGame ? "rgba(0,0,0,0)" : "rgba(0,0,0,0.3)"}
-        left="0"
-        top="0"
-        position="absolute"
-        w="100%"
-        h="100vh"
-        justifyContent="center"
-      >
-        {inGame ? (
-          <GameUi hooks={props.hooks} />
-        ) : (
-          <MenuUi setInGame={setInGame} />
-        )}
-      </Flex>
-    </>
+    <Flex
+      visibility={inGame ? "hidden" : "visible"}
+      bg={inGame ? "rgba(0,0,0,0)" : "rgba(0,0,0,0.3)"}
+      left="0"
+      top="0"
+      position="absolute"
+      w="100%"
+      h="100vh"
+      justifyContent="center"
+    >
+      {inGame ? (
+        <GameUi hooks={props.hooks} />
+      ) : inOptions ? (
+        <OptionsUi setInOptions={setInOptions} />
+      ) : (
+        <MenuUi setInGame={setInGame} setInOptions={setInOptions} />
+      )}
+    </Flex>
   );
 }
 

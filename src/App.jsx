@@ -8,6 +8,7 @@ import * as THREE from "three";
 import GameLogic from "./GameLogic";
 import { CellBoardContext } from "./CellBoardContext";
 import Ui from "../components/Ui";
+import { ColorContext } from "../components/ColorContext";
 
 const CELL_ROWS = 25;
 const CELL_COLUMNS = 25;
@@ -45,7 +46,8 @@ const Plane = (props) => {
   );
 };
 
-const Scene = ({ playing, board, setBoard }) => {
+const Scene = ({ colorHook, playing, board, setBoard }) => {
+  const { color, setColor } = colorHook;
   useEffect(() => {
     const handle = setInterval(() => {
       if (playing) setBoard((curr) => GameLogic(curr));
@@ -83,17 +85,19 @@ const Scene = ({ playing, board, setBoard }) => {
         penumbra={1}
       />
       <CellBoardContext.Provider value={{ board, setBoard }}>
-        {[...Array(CELL_ROWS)].map((_, index) => {
-          return [...Array(CELL_COLUMNS)].map((_, jndex) => {
-            return (
-              <Cell
-                phase={(index + jndex) / Math.max(CELL_ROWS, CELL_COLUMNS)}
-                key={[index, jndex]}
-                position={[index, 2, jndex]}
-              />
-            );
-          });
-        })}
+        <ColorContext.Provider value={{ color, setColor }}>
+          {[...Array(CELL_ROWS)].map((_, index) => {
+            return [...Array(CELL_COLUMNS)].map((_, jndex) => {
+              return (
+                <Cell
+                  phase={(index + jndex) / Math.max(CELL_ROWS, CELL_COLUMNS)}
+                  key={[index, jndex]}
+                  position={[index, 2, jndex]}
+                />
+              );
+            });
+          })}
+        </ColorContext.Provider>
       </CellBoardContext.Provider>
       <CameraController
         maxZoom={MAXZOOM}
@@ -106,31 +110,48 @@ const Scene = ({ playing, board, setBoard }) => {
 };
 
 function App() {
+  const [color, setColor] = useState("#ff5722");
   const [playing, setPlaying] = useState(false);
+  const [inGame, setInGame] = useState(false);
   const [board, setBoard] = useState(
     [...Array(CELL_ROWS)].map(() => [...Array(CELL_COLUMNS)].fill(0))
   );
-  return (
-    <Box h="100vh">
-      <Canvas
-        camera={{
-          position: [
-            2 * Math.max(CELL_ROWS, CELL_COLUMNS),
-            2 * Math.max(CELL_ROWS, CELL_COLUMNS),
-            0,
-          ],
-        }}
-        onCreated={({ gl }) => {
-          gl.shadowMap.enabled = true;
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
-        }}
-      >
-        <fog attach="fog" args={["black", 50, 200]} />
-        <Scene playing={playing} board={board} setBoard={setBoard} />
-      </Canvas>
 
-      <Ui hooks={{ playing, setPlaying, board, setBoard }} />
-    </Box>
+  document.addEventListener("keyup", (e) => {
+    if (e.code === "Escape" && inGame) setInGame(false);
+  });
+
+  return (
+    <ColorContext.Provider value={{ color, setColor }}>
+      <Box h="100vh">
+        <Canvas
+          camera={{
+            position: [
+              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
+              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
+              0,
+            ],
+          }}
+          onCreated={({ gl }) => {
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
+          }}
+        >
+          <fog attach="fog" args={["black", 50, 200]} />
+          <Scene
+            colorHook={{ color, setColor }}
+            playing={playing}
+            board={board}
+            setBoard={setBoard}
+          />
+        </Canvas>
+
+        <Ui
+          inGame={{ inGame, setInGame }}
+          hooks={{ playing, setPlaying, board, setBoard }}
+        />
+      </Box>
+    </ColorContext.Provider>
   );
 }
 

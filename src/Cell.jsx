@@ -8,11 +8,13 @@ import React, {
 import { useFrame } from "@react-three/fiber";
 import { Color, Vector3 } from "three";
 import { CellBoardContext } from "./CellBoardContext";
-
-const lifeColor = new Color(0xfa5003);
-const deadColor = new Color(0xcacaca);
+import { ColorContext } from "../components/ColorContext";
 
 function Cell(props) {
+  const { color } = useContext(ColorContext);
+  const lifeColor = new Color(color);
+  const deadColor = new Color(0xcacaca);
+
   const initalY = props.position[1];
   const meshpm = useRef();
   const mesh = useRef();
