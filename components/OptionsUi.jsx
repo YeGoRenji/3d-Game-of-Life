@@ -2,11 +2,12 @@ import { Box, Flex, Grid, Text } from "@chakra-ui/layout";
 import React, { useContext } from "react";
 import { CirclePicker } from "react-color";
 import { ColorContext } from "./ColorContext";
+import { isWhiteAccessible } from "./ColorFunctions";
 import { MenuUiBtn } from "./MenuUiBtn";
 
 function OptionsUi({ setInOptions }) {
   const colors = [
-    "#f44336", //
+    "#f44336",
     "#e91e63",
     "#9c27b0",
     "#673ab7",
@@ -18,7 +19,7 @@ function OptionsUi({ setInOptions }) {
     "#4caf50",
     "#8bc34a",
     "#cddc39",
-    "#F7DF1E",
+    "#f7df1e",
     "#ffc107",
     "#ff9800",
     "#ff5722",
@@ -53,7 +54,8 @@ function OptionsUi({ setInOptions }) {
           textAlign="center"
           display="grid"
           alignItems="center"
-          color={color === "#f7df1e" ? "black" : "white"}
+          transition=".2s ease-in-out"
+          color={isWhiteAccessible(color) ? "white" : "black"}
           my="20px"
           bg={color}
           h="50px"

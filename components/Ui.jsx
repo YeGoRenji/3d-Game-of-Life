@@ -91,6 +91,7 @@ function Ui(props) {
       left="0"
       top="0"
       position="absolute"
+      transition=".5s ease-in-out"
       w="100%"
       h="100vh"
       justifyContent="center"
