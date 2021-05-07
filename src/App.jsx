@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Cell from "./Cell";
 import { Box } from "@chakra-ui/react";
@@ -9,9 +9,10 @@ import GameLogic from "./GameLogic";
 import { CellBoardContext } from "./CellBoardContext";
 import Ui from "../components/Ui";
 import { ColorContext } from "../components/ColorContext";
+import { CellDimContext } from "./CellDimContext";
 
-const CELL_ROWS = 25;
-const CELL_COLUMNS = 25;
+// const CELL_ROWS = 30;
+// const CELL_COLUMNS = 5;
 const MAXZOOM = 50;
 const MINZOOM = 10;
 const h = 30;
@@ -48,6 +49,7 @@ const Plane = (props) => {
 
 const Scene = ({ colorHook, playing, board, setBoard }) => {
   const { color, setColor } = colorHook;
+  const { cellDim } = useContext(CellDimContext);
   useEffect(() => {
     const handle = setInterval(() => {
       if (playing) setBoard((curr) => GameLogic(curr));
@@ -62,10 +64,10 @@ const Scene = ({ colorHook, playing, board, setBoard }) => {
   scene.background = new THREE.Color(0x000000);
   const targetObj = new THREE.Object3D();
   scene.add(targetObj);
-  targetObj.position.set((CELL_ROWS - 1) / 2, 0, (CELL_COLUMNS - 1) / 2);
-
+  targetObj.position.set((cellDim.h - 1) / 2, 0, (cellDim.w - 1) / 2);
   return (
     <>
+      <fog attach="fog" args={["black", 50, 200]} />
       <ambientLight intensity={0.2} />
       <Plane
         color="white"
@@ -78,19 +80,20 @@ const Scene = ({ colorHook, playing, board, setBoard }) => {
         castShadow
         intensity={0.5}
         target={targetObj}
-        position={[(CELL_ROWS - 1) / 2, h, (CELL_COLUMNS - 1) / 2]}
+        position={[(cellDim.h - 1) / 2, h, (cellDim.w - 1) / 2]}
         angle={Math.atan(
-          (Math.max(CELL_ROWS, CELL_COLUMNS) * Math.sqrt(2)) / (2 * h) + 0.2
+          (Math.max(cellDim.h, cellDim.w) * Math.sqrt(2)) / (2 * h) + 0.2
         )}
         penumbra={1}
       />
       <CellBoardContext.Provider value={{ board, setBoard }}>
         <ColorContext.Provider value={{ color, setColor }}>
-          {[...Array(CELL_ROWS)].map((_, index) => {
-            return [...Array(CELL_COLUMNS)].map((_, jndex) => {
+          {board.map((row, index) => {
+            return row.map((_, jndex) => {
               return (
                 <Cell
-                  phase={(index + jndex) / Math.max(CELL_ROWS, CELL_COLUMNS)}
+                  Life={board[index][jndex]}
+                  phase={(index + jndex) / Math.max(cellDim.h, cellDim.w)}
                   key={[index, jndex]}
                   position={[index, 2, jndex]}
                 />
@@ -102,7 +105,7 @@ const Scene = ({ colorHook, playing, board, setBoard }) => {
       <CameraController
         maxZoom={MAXZOOM}
         minZoom={MINZOOM}
-        cellNum={{ cellRows: CELL_ROWS, cellColumns: CELL_COLUMNS }}
+        cellNum={{ cellRows: cellDim.h, cellColumns: cellDim.w }}
         target={targetObj}
       />
     </>
@@ -113,10 +116,10 @@ function App() {
   const [color, setColor] = useState("#ff5722");
   const [playing, setPlaying] = useState(false);
   const [inGame, setInGame] = useState(false);
+  const [cellDim, setCellDim] = useState({ w: 25, h: 25 });
   const [board, setBoard] = useState(
-    [...Array(CELL_ROWS)].map(() => [...Array(CELL_COLUMNS)].fill(0))
+    [...Array(cellDim.h)].map(() => [...Array(cellDim.w)].fill(0))
   );
-
   document.addEventListener("keyup", (e) => {
     if (e.code === "Escape" && inGame) setInGame(false);
   });
@@ -127,8 +130,8 @@ function App() {
         <Canvas
           camera={{
             position: [
-              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
-              2 * Math.max(CELL_ROWS, CELL_COLUMNS),
+              2 * Math.max(cellDim.h, cellDim.w),
+              2 * Math.max(cellDim.h, cellDim.w),
               0,
             ],
           }}
@@ -137,19 +140,21 @@ function App() {
             gl.shadowMap.type = THREE.PCFSoftShadowMap;
           }}
         >
-          <fog attach="fog" args={["black", 50, 200]} />
-          <Scene
-            colorHook={{ color, setColor }}
-            playing={playing}
-            board={board}
-            setBoard={setBoard}
-          />
+          <CellDimContext.Provider value={{ cellDim, setCellDim }}>
+            <Scene
+              colorHook={{ color, setColor }}
+              playing={playing}
+              board={board}
+              setBoard={setBoard}
+            />
+          </CellDimContext.Provider>
         </Canvas>
-
-        <Ui
-          inGame={{ inGame, setInGame }}
-          hooks={{ playing, setPlaying, board, setBoard }}
-        />
+        <CellDimContext.Provider value={{ cellDim, setCellDim }}>
+          <Ui
+            inGame={{ inGame, setInGame }}
+            hooks={{ playing, setPlaying, board, setBoard }}
+          />
+        </CellDimContext.Provider>
       </Box>
     </ColorContext.Provider>
   );

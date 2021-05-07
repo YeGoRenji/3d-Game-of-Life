@@ -9,6 +9,7 @@ const CameraController = (props) => {
     const controls = new OrbitControls(camera, gl.domElement);
     controls.target = props.target.position;
     controls.maxPolarAngle = Math.PI / 3;
+    controls.enablePan = false;
     controls.minDistance = props.minZoom;
     controls.maxDistance = props.maxZoom;
     controls.update();

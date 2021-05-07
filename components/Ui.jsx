@@ -99,7 +99,10 @@ function Ui(props) {
       {inGame ? (
         <GameUi hooks={props.hooks} />
       ) : inOptions ? (
-        <OptionsUi setInOptions={setInOptions} />
+        <OptionsUi
+          setBoard={props.hooks.setBoard}
+          setInOptions={setInOptions}
+        />
       ) : (
         <MenuUi setInGame={setInGame} setInOptions={setInOptions} />
       )}

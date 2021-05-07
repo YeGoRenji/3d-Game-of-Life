@@ -1,11 +1,18 @@
-import { Box, Flex, Grid, Text } from "@chakra-ui/layout";
-import React, { useContext } from "react";
+import { Flex, Grid, Text } from "@chakra-ui/layout";
+import {
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/number-input";
+import React, { useContext, useRef } from "react";
 import { CirclePicker } from "react-color";
+import { CellBoardContext } from "../src/CellBoardContext";
+import { CellDimContext } from "../src/CellDimContext";
 import { ColorContext } from "./ColorContext";
-import { isWhiteAccessible } from "./ColorFunctions";
 import { MenuUiBtn } from "./MenuUiBtn";
-
-function OptionsUi({ setInOptions }) {
+function OptionsUi({ setBoard, setInOptions }) {
   const colors = [
     "#f44336",
     "#e91e63",
@@ -26,10 +33,13 @@ function OptionsUi({ setInOptions }) {
     "#795548",
     "#607d8b",
   ];
+  const { cellDim, setCellDim } = useContext(CellDimContext);
   const { color, setColor } = useContext(ColorContext);
-  const handleChange = (color, event) => {
+  const handleChange = (color) => {
     setColor(color.hex);
   };
+  const wfield = useRef();
+  const hfield = useRef();
   return (
     <Grid
       justifyContent="center"
@@ -46,28 +56,78 @@ function OptionsUi({ setInOptions }) {
       >
         OPTIONS
       </Text>
-      <Flex align="center" flexDirection="column">
-        <Box
-          fontWeight="bold"
-          fontFamily="roboto"
-          borderRadius="10px"
-          textAlign="center"
-          display="grid"
-          alignItems="center"
-          transition=".2s ease-in-out"
-          color={isWhiteAccessible(color) ? "white" : "black"}
-          my="20px"
-          bg={color}
-          h="50px"
-          w="70px"
-        >
-          COLOR
-        </Box>
-        <CirclePicker colors={colors} color={color} onChange={handleChange} />
-        <MenuUiBtn onClick={() => setInOptions(false)} mt="200px">
-          RETURN
-        </MenuUiBtn>
-      </Flex>
+      <Grid justifyItems="center" gridTemplateRows="50px auto auto">
+        <Flex align="center">
+          <Text
+            textAlign="center"
+            fontFamily="roboto"
+            fontSize="20px"
+            color="white"
+          >
+            Board:
+          </Text>
+          <NumberInput
+            color="white"
+            mx="5px"
+            h="40px"
+            w="80px"
+            defaultValue={cellDim.w}
+            min={5}
+            max={40}
+          >
+            <NumberInputField
+              _focus={{ border: `2px solid ${color}` }}
+              ref={wfield}
+            />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <NumberInput
+            color="white"
+            mx="5px"
+            h="40px"
+            w="80px"
+            defaultValue={cellDim.h}
+            min={5}
+            max={40}
+          >
+            <NumberInputField
+              _focus={{ border: `2px solid ${color}` }}
+              ref={hfield}
+            />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <MenuUiBtn
+            mx="5px"
+            w="50px"
+            h="40px"
+            onClick={() => {
+              setCellDim({
+                w: Number(wfield.current.value),
+                h: Number(hfield.current.value),
+              });
+              setBoard((currBoard) =>
+                [...Array(Number(hfield.current.value))].map((_, index) =>
+                  [...Array(Number(wfield.current.value))].map((_, jndex) =>
+                    currBoard[index] !== undefined ? currBoard[index][jndex] : 0
+                  )
+                )
+              );
+            }}
+          >
+            Save
+          </MenuUiBtn>
+        </Flex>
+        <Flex mt="50px" align="center" flexDirection="column">
+          <CirclePicker colors={colors} color={color} onChange={handleChange} />
+        </Flex>
+        <MenuUiBtn onClick={() => setInOptions(false)}>RETURN</MenuUiBtn>
+      </Grid>
     </Grid>
   );
 }
