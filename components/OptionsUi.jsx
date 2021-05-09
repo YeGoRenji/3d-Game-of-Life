@@ -6,12 +6,16 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from "@chakra-ui/number-input";
+import { Tooltip } from "@chakra-ui/tooltip";
 import React, { useContext, useRef } from "react";
 import { CirclePicker } from "react-color";
-import { CellBoardContext } from "../src/CellBoardContext";
 import { CellDimContext } from "../src/CellDimContext";
 import { ColorContext } from "./ColorContext";
 import { MenuUiBtn } from "./MenuUiBtn";
+
+const SIZE_MIN = 1;
+const SIZE_MAX = 100;
+
 function OptionsUi({ setBoard, setInOptions }) {
   const colors = [
     "#f44336",
@@ -72,8 +76,8 @@ function OptionsUi({ setBoard, setInOptions }) {
             h="40px"
             w="80px"
             defaultValue={cellDim.w}
-            min={5}
-            max={40}
+            min={SIZE_MIN}
+            max={SIZE_MAX}
           >
             <NumberInputField
               _focus={{ border: `2px solid ${color}` }}
@@ -90,8 +94,8 @@ function OptionsUi({ setBoard, setInOptions }) {
             h="40px"
             w="80px"
             defaultValue={cellDim.h}
-            min={5}
-            max={40}
+            min={SIZE_MIN}
+            max={SIZE_MAX}
           >
             <NumberInputField
               _focus={{ border: `2px solid ${color}` }}
@@ -107,20 +111,38 @@ function OptionsUi({ setBoard, setInOptions }) {
             w="50px"
             h="40px"
             onClick={() => {
+              const width = Number(
+                wfield.current.value !== "" ? wfield.current.value : SIZE_MIN
+              );
+              const height = Number(
+                hfield.current.value !== "" ? hfield.current.value : SIZE_MIN
+              );
               setCellDim({
-                w: Number(wfield.current.value),
-                h: Number(hfield.current.value),
+                w: width,
+                h: height,
               });
               setBoard((currBoard) =>
-                [...Array(Number(hfield.current.value))].map((_, index) =>
-                  [...Array(Number(wfield.current.value))].map((_, jndex) =>
+                [...Array(height)].map((_, index) =>
+                  [...Array(width)].map((_, jndex) =>
                     currBoard[index] !== undefined ? currBoard[index][jndex] : 0
                   )
                 )
               );
             }}
           >
-            Save
+            <Tooltip
+              hasArrow
+              bg="gray.600"
+              label={
+                wfield.current &&
+                (Number(wfield.current.value) >= 50 ||
+                Number(hfield.current.value) >= 50
+                  ? "50 plus size may result in bad performence"
+                  : "")
+              }
+            >
+              Save
+            </Tooltip>
           </MenuUiBtn>
         </Flex>
         <Flex mt="50px" align="center" flexDirection="column">
