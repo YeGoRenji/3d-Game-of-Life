@@ -1,15 +1,25 @@
 import React, { useCallback, useContext, useState } from "react";
 import { FaPlay, FaStepForward, FaPause, FaRedoAlt } from "react-icons/fa";
 import GameLogic from "../src/GameLogic";
-import { Box, Flex, Grid, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Grid,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
+  Text,
+} from "@chakra-ui/react";
 import OptionsUi from "./OptionsUi";
 import { MenuUiBtn } from "./MenuUiBtn";
 import { GameUiBtn } from "./GameUiBtn";
 import { ColorContext } from "./ColorContext";
+import { isWhiteAccessible } from "./ColorFunctions";
 
 const GameUi = (props) => {
   const { color } = useContext(ColorContext);
-  const { playing, setPlaying, board, setBoard } = props.hooks;
+  const { speed, setSpeed, playing, setPlaying, board, setBoard } = props.hooks;
   const resetBoard = useCallback(() => {
     const updatedBoard = [...board];
     updatedBoard.map((a) => a.fill(0));
@@ -21,13 +31,17 @@ const GameUi = (props) => {
         visibility="visible"
         borderRadius="10px"
         border="2px solid rgba(255,255,255,0.2)"
+        display="flex"
+        alignItems="center"
         position="absolute"
         bottom="10px"
       >
+        {/* Play Button */}
         <GameUiBtn onClick={() => setPlaying(!playing)}>
           {playing ? <FaPause /> : <FaPlay />}
         </GameUiBtn>
 
+        {/* Forward Button */}
         <GameUiBtn
           onClick={() => {
             if (!playing) setBoard((curr) => GameLogic(curr));
@@ -35,10 +49,41 @@ const GameUi = (props) => {
         >
           <FaStepForward />
         </GameUiBtn>
-
+        {/* Redo Button */}
         <GameUiBtn onClick={resetBoard}>
           <FaRedoAlt />
         </GameUiBtn>
+        {/* Speed Control Button */}
+        <Slider
+          minH="50"
+          orientation="vertical"
+          defaultValue={speed}
+          min={200}
+          max={1000}
+          step={50}
+          onChange={(val) => setSpeed(val)}
+        >
+          <SliderTrack>
+            <SliderFilledTrack bg={color} />
+          </SliderTrack>
+          <SliderThumb _focus={{ outline: "none" }} />
+        </Slider>
+        <Box
+          display="grid"
+          margin="10px"
+          fontWeight="bold"
+          bg={color}
+          h="50px"
+          w="100px"
+          borderRadius="10px"
+          alignItems="center"
+          textAlign="center"
+          verticalAlign="center"
+          color={isWhiteAccessible(color) ? "white" : "black"}
+          fontFamily="Roboto"
+        >
+          {speed} ms
+        </Box>
       </Box>
       <Box
         fontFamily="roboto"

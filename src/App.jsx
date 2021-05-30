@@ -47,13 +47,13 @@ const Plane = (props) => {
   );
 };
 
-const Scene = ({ colorHook, playing, board, setBoard }) => {
+const Scene = ({ speed, colorHook, playing, board, setBoard }) => {
   const { color, setColor } = colorHook;
   const { cellDim } = useContext(CellDimContext);
   useEffect(() => {
     const handle = setInterval(() => {
       if (playing) setBoard((curr) => GameLogic(curr));
-    }, 500);
+    }, speed);
 
     return () => {
       clearInterval(handle);
@@ -113,6 +113,7 @@ const Scene = ({ colorHook, playing, board, setBoard }) => {
 };
 
 function App() {
+  const [speed, setSpeed] = useState(500);
   const [color, setColor] = useState("#ff5722");
   const [playing, setPlaying] = useState(false);
   const [inGame, setInGame] = useState(false);
@@ -142,6 +143,7 @@ function App() {
         >
           <CellDimContext.Provider value={{ cellDim, setCellDim }}>
             <Scene
+              speed={speed}
               colorHook={{ color, setColor }}
               playing={playing}
               board={board}
@@ -152,7 +154,7 @@ function App() {
         <CellDimContext.Provider value={{ cellDim, setCellDim }}>
           <Ui
             inGame={{ inGame, setInGame }}
-            hooks={{ playing, setPlaying, board, setBoard }}
+            hooks={{ speed, setSpeed, playing, setPlaying, board, setBoard }}
           />
         </CellDimContext.Provider>
       </Box>
