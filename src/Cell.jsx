@@ -1,7 +1,6 @@
 import React, {
   useContext,
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from "react";
@@ -13,6 +12,7 @@ import { ColorContext } from "../components/ColorContext";
 function Cell(props) {
   const { Life } = props;
   const { color } = useContext(ColorContext);
+  const [hovered, setHovered] = useState(false);
   const lifeColor = new Color(color);
   const deadColor = new Color(0xcacaca);
   const initalY = props.position[1];
@@ -89,18 +89,28 @@ function Cell(props) {
   });
   const handleBoardUpdate = useCallback(
     (e) => {
-      if (e.intersections[0].object.uuid === e.object.uuid) {
-        const updatedBoard = [...board];
-        updatedBoard[i][j] = Number(!updatedBoard[i][j]);
-        setBoard(updatedBoard);
-      }
+      e.stopPropagation()
+      const updatedBoard = [...board];
+      updatedBoard[i][j] = Number(!updatedBoard[i][j]);
+      setBoard(updatedBoard);
     },
     [board]
   );
+
+  const checkHover = useCallback((e, state) => {
+    e.stopPropagation()
+    setHovered(state);
+  });
+
   return (
-    <mesh castShadow onClick={handleBoardUpdate} {...props} ref={mesh}>
+    <mesh
+      castShadow
+      onClick={handleBoardUpdate}
+      onPointerOver={(event) => checkHover(event, true)}
+      onPointerOut={(event) => checkHover(event, false)}
+      {...props} ref={mesh}>
       <boxBufferGeometry attach="geometry" args={[1, 0.5, 1]} />
-      <meshPhysicalMaterial attach="material" ref={meshpm} />
+      <meshPhysicalMaterial emissive={hovered ? 0x707070 : 0x0} attach="material" ref={meshpm} />
     </mesh>
   );
 }

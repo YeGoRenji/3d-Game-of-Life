@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Cell from "./Cell";
 import { Box } from "@chakra-ui/react";

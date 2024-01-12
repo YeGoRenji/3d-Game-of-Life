@@ -71,6 +71,7 @@ const GameUi = (props) => {
         <Box
           display="grid"
           margin="10px"
+          fontFamily="roboto"
           fontWeight="bold"
           bg={color}
           h="50px"
@@ -80,7 +81,6 @@ const GameUi = (props) => {
           textAlign="center"
           verticalAlign="center"
           color={isWhiteAccessible(color) ? "white" : "black"}
-          fontFamily="Roboto"
         >
           {speed} ms
         </Box>
@@ -88,13 +88,14 @@ const GameUi = (props) => {
       <Box
         fontFamily="roboto"
         position="absolute"
-        fontWeight="bold"
+        fontWeight="extrabold"
         right="5px"
         bottom="0"
         color={color}
+        textShadow={"1px 1px #000000"}
         visibility="visible"
       >
-        BY YEGO
+        <a target="_blank" href="https://github.com/YeGoRenji/">@YeGoRenji</a>
       </Box>
     </>
   );
