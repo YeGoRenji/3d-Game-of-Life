@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
+import React, { useState, useRef, useEffect, useContext, Suspense, lazy } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Cell from "./Cell";
 import { Box } from "@chakra-ui/react";
@@ -10,6 +10,7 @@ import { CellBoardContext } from "./CellBoardContext";
 import Ui from "../components/Ui";
 import { ColorContext } from "../components/ColorContext";
 import { CellDimContext } from "./CellDimContext";
+import { Loader } from "@react-three/drei";
 
 // const CELL_ROWS = 30;
 // const CELL_COLUMNS = 5;
@@ -38,7 +39,7 @@ const Plane = (props) => {
   const mesh = useRef();
   return (
     <mesh receiveShadow {...props} ref={mesh}>
-      <planeBufferGeometry
+      <planeGeometry
         attach="geometry"
         args={[props.width, props.height]}
       />
@@ -88,6 +89,7 @@ const Scene = ({ speed, colorHook, playing, board, setBoard }) => {
       />
       <CellBoardContext.Provider value={{ board, setBoard }}>
         <ColorContext.Provider value={{ color, setColor }}>
+          <Suspense fallback={<Loader />} >
           {board.map((row, index) => {
             return row.map((_, jndex) => {
               return (
@@ -100,6 +102,7 @@ const Scene = ({ speed, colorHook, playing, board, setBoard }) => {
               );
             });
           })}
+          </Suspense>
         </ColorContext.Provider>
       </CellBoardContext.Provider>
       <CameraController
@@ -108,6 +111,7 @@ const Scene = ({ speed, colorHook, playing, board, setBoard }) => {
         cellNum={{ cellRows: cellDim.h, cellColumns: cellDim.w }}
         target={targetObj}
       />
+      <axesHelper args={[5]} />
     </>
   );
 };
@@ -128,29 +132,29 @@ function App() {
   return (
     <ColorContext.Provider value={{ color, setColor }}>
       <Box h="100vh">
-        <Canvas
-          camera={{
-            position: [
-              2 * Math.max(cellDim.h, cellDim.w),
-              2 * Math.max(cellDim.h, cellDim.w),
-              0,
-            ],
-          }}
-          onCreated={({ gl }) => {
-            gl.shadowMap.enabled = true;
-            gl.shadowMap.type = THREE.PCFSoftShadowMap;
-          }}
-        >
-          <CellDimContext.Provider value={{ cellDim, setCellDim }}>
-            <Scene
-              speed={speed}
-              colorHook={{ color, setColor }}
-              playing={playing}
-              board={board}
-              setBoard={setBoard}
-            />
-          </CellDimContext.Provider>
-        </Canvas>
+          <Canvas
+            camera={{
+              position: [
+                cellDim.h,
+                1.2 * Math.max(cellDim.w, cellDim.h),
+                cellDim.w,
+              ],
+            }}
+            onCreated={({ gl }) => {
+              gl.shadowMap.enabled = true;
+              gl.shadowMap.type = THREE.PCFSoftShadowMap;
+            }}
+          >
+            <CellDimContext.Provider value={{ cellDim, setCellDim }}>
+              <Scene
+                speed={speed}
+                colorHook={{ color, setColor }}
+                playing={playing}
+                board={board}
+                setBoard={setBoard}
+              />
+            </CellDimContext.Provider>
+          </Canvas>
         <CellDimContext.Provider value={{ cellDim, setCellDim }}>
           <Ui
             inGame={{ inGame, setInGame }}
