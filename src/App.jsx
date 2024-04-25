@@ -111,7 +111,6 @@ const Scene = ({ speed, colorHook, playing, board, setBoard }) => {
         cellNum={{ cellRows: cellDim.h, cellColumns: cellDim.w }}
         target={targetObj}
       />
-      <axesHelper args={[5]} />
     </>
   );
 };
